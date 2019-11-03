@@ -19,9 +19,6 @@ const mutations = {
   },
   attack (state) {
     state.player.mode = "";
-  },
-  getUserList() {
-    window.console.log('xxx');
   }
 };
 
@@ -33,9 +30,6 @@ const actions = {
       game: response.data.game[1]
     });
     return true;
-  },
-  io_test() {
-    window.console.log('xxx');
   }
 };
 

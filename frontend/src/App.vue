@@ -4,10 +4,9 @@
   </div>
 </template>
 <script>
-
+import Vue from 'vue';
 import Libs from './libs';
 import mixins from './mixins';
-import Vue from 'vue';
 
 Vue.mixin({
   ...mixins

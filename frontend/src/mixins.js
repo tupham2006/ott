@@ -1,5 +1,6 @@
 import * as Cookies from "js-cookie";
 import langs from './langs/base';
+import config from './config';
 export default {
   methods: {
     socketPayload(params) {
@@ -19,6 +20,12 @@ export default {
     trans(obj, key) {
       const langArray = langs[obj][key];
       return langArray[Math.floor(Math.random() * langArray.length)];
+    },
+    async request(url, method) {
+      method = method || 'get';
+      let response = await this.$axios[method](config.serverOrigin + url);
+      let data = response.data ? response.data : null;
+      return data;
     }
   }
 }

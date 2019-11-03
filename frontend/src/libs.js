@@ -1,5 +1,9 @@
 import Vue from 'vue';
 
+// Import config
+import config from './config';
+Vue.prototype.$config = config;
+
 // Bootstrap
 import BootstrapVue from 'bootstrap-vue';
 import 'bootstrap/dist/css/bootstrap.css';
@@ -25,7 +29,7 @@ Vue.use(FlagIcon);
 // Socket
 import VueSocketIO from 'vue-socket.io';
 Vue.use(new VueSocketIO({
-  connection: 'http://localhost:8081',
+  connection: config.serverOrigin,
   vuex: {
     store,
     actionPrefix: 'io',
@@ -35,6 +39,13 @@ Vue.use(new VueSocketIO({
 
 // Router
 import router from './router';
+
+// Axios
+import axios from 'axios';
+import VueAxios from 'vue-axios';
+Vue.use(VueAxios, axios);
+Vue.prototype.$axios = axios;
+
 
 // Export module
 export default {

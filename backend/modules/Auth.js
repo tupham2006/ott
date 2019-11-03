@@ -11,6 +11,7 @@ module.exports = ($) => {
       user = $.data.sessions[cookies.ott.user.id];
       if(user) {
         user.sid = socket.id;
+        user.is_online = 1;
         $.data.clients[socket.id] = { id: user.id };
       }
     }
@@ -23,7 +24,8 @@ module.exports = ($) => {
         sid: socket.id,
         name: 'Cừu cuteeee',
         invite_list: {},
-        status: 0
+        game_id: 0,
+        is_online: 1
       };
     }
     socket.emit("$updateUser", user);
