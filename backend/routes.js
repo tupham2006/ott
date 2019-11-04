@@ -2,11 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 module.exports = ($, Game) => {
-  router.get('/select', function (req, res) {
-    let data = {
-      trollList: Game.getTrollList(),
-      backgroundList: Game.getBackgroundList()
-    };
+  router.get('/select', async (req, res) => {
+    let data = {};
+    data.trollList = await Game.getTrollList();
+    data.backgroundList = await Game.getBackgroundList();
     res.send(data);
   });
 

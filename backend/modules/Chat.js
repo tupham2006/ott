@@ -1,16 +1,7 @@
 module.exports = ($) => {
-  let getChatList = function(socket) {
-    let data = $.data, userList = [], i, user;
-    for(i in data.clients) {
-      user = data.sessions[data.clients[i].id];
-      if(user && user.is_online) {
-        userList.push({
-          id: user.id,
-          name: user.name,
-        });
-      }
-    }
-    socket.emit('$getChatList', userList);
+  let getChatList = async function() {
+    let userList = await $.models.User.find({is_online: 1}, {id: 1, name: 1, _id: 0 }).exec();
+    $.io.emit('$getChatList', userList);
   };
   return {
     getChatList

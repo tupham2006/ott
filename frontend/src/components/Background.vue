@@ -22,7 +22,7 @@ export default {
           url = require(`@/assets/images/${this.page}/background.jpg`);
           break;
         case 'select':
-          url = require(`@/assets/game/backgrounds/${this.id}.jpg`);
+          url = this.serverLink(`/game/backgrounds/${this.id}.jpg`);
           break;
         case 'room':
           url = require(`@/assets/images/${this.page}/background.jpg`);

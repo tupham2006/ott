@@ -1,5 +1,5 @@
 module.exports = ($) => {
-  let startSession = (socket) => {
+  let startSession = async (socket) => {
     if($.data.clients[socket.id]) {
       return true;
     }
@@ -8,27 +8,32 @@ module.exports = ($) => {
     let cookies = $.Common.cookie(socket.handshake.headers.cookie);
     let user = cookies && cookies.ott && cookies.ott && cookies.ott.user;
     if(user) {
-      user = $.data.sessions[cookies.ott.user.id];
+      user = await $.models.User.findOne({ id: user.id }).exec();
       if(user) {
         user.sid = socket.id;
         user.is_online = 1;
         $.data.clients[socket.id] = { id: user.id };
+        await $.models.User.updateOne({
+          '_id': user._id
+        }, user).exec();
       }
     }
 
     if(!user) {
-      const id = $.Common.unix();
+      const id = await $.Common.newId($.models.User);
       $.data.clients[socket.id] = { id: id };
-      user = $.data.sessions[id] = {
+      user = {
         id: id,
         sid: socket.id,
-        name: 'Cừu cuteeee',
+        name: `Cừu cuteeee ${id}`,
         invite_list: {},
         game_id: 0,
         is_online: 1
       };
+      await new $.models.User(user).save();
     }
     socket.emit("$updateUser", user);
+    $.modules.Chat.getChatList();
   };
 
   let auth = (socket, cookies) => {

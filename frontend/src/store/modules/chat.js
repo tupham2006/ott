@@ -3,7 +3,7 @@ const state = {
 
 const mutations = {
   getChatList(state, data) {
-    Object.assign(state, data);
+    state = Object.assign([], data);
   }
 };
 

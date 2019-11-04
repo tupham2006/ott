@@ -31,10 +31,10 @@ export default {
       let url = ''
       switch(this.type) {
         case 'troller':
-          url = require(`@/assets/game/trollers/${this.id}/avatar.jpg`);
+          url = this.serverLink(`/game/trollers/${this.id}/avatar.jpg`);
           break;
         case 'background':
-          url = require(`@/assets/game/backgrounds/${this.id}.jpg`);
+          url = this.serverLink(`/game/backgrounds/${this.id}.jpg`);
           break;
       }
       return url;

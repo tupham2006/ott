@@ -19,6 +19,7 @@
     "bootstrap-vue": "^2.0.4",
     "core-js": "^3.3.2",
     "js-cookie": "^2.2.1",
+    "konva": "^4.0.16",
     "socket.io": "^2.3.0",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
@@ -37,6 +38,8 @@
     "babel-eslint": "^10.0.3",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^8.0.0",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {

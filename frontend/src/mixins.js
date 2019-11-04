@@ -26,6 +26,9 @@ export default {
       let response = await this.$axios[method](config.serverOrigin + url);
       let data = response.data ? response.data : null;
       return data;
+    },
+    serverLink(link) {
+      return config.serverOrigin + link;
     }
   }
 }

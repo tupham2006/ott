@@ -3,24 +3,31 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 const cors = require('cors');
-
+const mongoose = require('mongoose');
 var $ = {
   data: {
     sessions: {},
     clients: {},
     games: [null]
-  }
+  },
+  db: mongoose,
+  modules: {},
+  models: {}
 };
 
-$.Common = require('./modules/Common');
+$.Common = require('./modules/Common')($);
 $.basePath = __dirname;
-const Auth = require('./modules/Auth')($);
-const Chat = require('./modules/Chat')($);
-const Game = require('./modules/Game')($);
+const Auth = $.modules.Auth = require('./modules/Auth')($);
+const Chat = $.modules.Chat = require('./modules/Chat')($);
+const Game = $.modules.Game = require('./modules/Game')($);
 
 /**
  * Http
  */
+process.on('uncaughtException', function(err) {
+  console.log("Server:\n", err);
+});
+
 let server = new express()
   .use(bodyParser.json())
   .use(cookieParser())
@@ -30,6 +37,15 @@ let server = new express()
   .use(cors())
   .use('/', require('./routes')($, Game))
   .listen(8081);
+$.db.connect('mongodb://localhost:27017/ott', { useNewUrlParser: true, useUnifiedTopology: true });
+$.db.connection.on('error',() => {
+  console.log("Error in database connection")
+});
+$.db.connection.once('open',function(){
+  console.log("DB connection established");
+});
+
+$.models.User = require($.basePath + '/models/User')($);
 
 /**
  * Socket IO
@@ -41,11 +57,12 @@ $.io.on("connection", (socket) => {
   Chat.getChatList(socket);
 
   // Handle disconnect
-  socket.on('disconnect', () => {
+  socket.on('disconnect', async () => {
     let client = $.data.clients[socket.id];
     if(client) {
-      $.data.sessions[client.id].is_online = 0;
+      await $.models.User.updateOne({id: client.id}, {is_online: 0}).exec();
       delete $.data.clients[socket.id];
+      await $.modules.Chat.getChatList();
     }
   });
   socket.on("updateUser", payload =>{ Auth.updateUser(socket, payload); });
@@ -53,4 +70,6 @@ $.io.on("connection", (socket) => {
   // Play game
   socket.on("inviteGame", payload => { Game.inviteGame(socket, payload); });
   socket.on("acceptInvite", payload => { Game.acceptInvite(socket, payload); });
+  socket.on("selectTroller", payload =>{ Game.selectTroller(socket, payload); });
+  socket.on("selectBackground", payload =>{ Game.selectBackground(socket, payload); });
 });
