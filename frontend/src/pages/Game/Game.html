@@ -1,0 +1,37 @@
+<Background id="game" v-if="game.players" :page="'select'" :id="game.background">
+  <div class="header">
+    <div class="user-info float-left">
+      <div class="float-left">
+        <Avatar :type="'troller'" :id="game.players[user.id].troller_id" class="troller-avatar"/>
+      </div>
+      <div class="float-right pl-3">
+        <div>
+          <div class="float-left border-small-text">{{ game.players[user.id].name }}</div>
+        </div>
+        <Hp :max_hp="game.players[user.id].max_hp" :hp="game.players[user.id].hp"/>
+      </div>
+    </div>
+    <div class="float-right boss-info">
+      <div class="float-right">
+        <Avatar :type="'troller'" :id="game.players[game.user_id_maps[user.id]].troller_id" class="troller-avatar" :reverse="true"/>
+      </div>
+      <div class="float-right pr-3">
+        <div>
+          <span class="boss-name float-right border-small-text"> {{ game.players[game.user_id_maps[user.id]].name }} </span>
+        </div>
+        <Hp :max_hp="game.players[user.id].max_hp" :hp="game.players[game.user_id_maps[user.id]].hp" :reverse="true"/>
+      </div>
+    </div>
+  </div>
+   <div class="d-flex justify-content-center">
+    <Troller class="troller-1" :face="game.players[game.user_id_maps[user.id]].troller_id" />
+   </div>
+   <Unti :troller_id="game.players[user.id].troller_id"/>
+   <!-- <div class="skill-container d-flex justify-content-center">
+      <div v-for="(item, index) in game.player.skills" :key="index">
+        <button type="button" class="btn skill-button" :class="{'btn-success': !game.player.mode, 'btn-danger': game.player.mode }" @click="attack(this)">
+          <Fa :icon="item.icon" :prefix="item.iconPrefix"/>
+        </button>
+     </div>
+   </div> -->
+</Background>

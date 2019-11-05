@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div :class="{'avatar': !is_selected, 'avatar-selected': !!is_selected}" v-bind:style="style"></div>
+    <div :class="{'avatar': !is_selected, 'avatar-selected': !!is_selected, 'reverse': reverse }" v-bind:style="style"></div>
   </div>
 </template>
 <script>
@@ -24,6 +24,9 @@ export default {
     },
     type: {
       type: String
+    },
+    reverse: {
+
     }
   },
   computed: {

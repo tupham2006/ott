@@ -1,48 +1,49 @@
 <template>
-  <div v-if="mana" @click="activePowerMode()" class="power" v-bind:style="style"></div>
+  <div class="unti" v-bind:style="style"></div>
 </template>
 <script>
 
 export default {
-  name: 'Power',
+  name: 'Unti',
   props: {
     mana: {
+
+    },
+    troller_id: {
 
     }
   },
   computed: {
     style () {
       return {
-        background: `url(${require('@/assets/images/power.png')}) center center / cover no-repeat`,
+        background: `url(${this.serverLink(`/game/trollers/${this.troller_id}/unti.jpg`)}) center center / cover no-repeat`,
         width: '100px',
         height: '100px',
       };
     }
   },
   methods: {
-    activePowerMode() {
-      this.$store.commit('game/activePowerMode');
-    }
   },
 }
 </script>
 
 <style type="text/css">
-  .power {
+  .unti {
     cursor: pointer;
     display: inline-block;
-    animation: pulse 0.5s infinite ease-in-out alternate;
+    animation: pulse 1s infinite ease-in-out alternate;
     position: fixed;
     bottom: 30%;
-    left: 20px
+    left: 20px;
+    border-radius: 50%;
   }
 
-  .power:hover {
+  .unti:hover {
     filter: brightness(110%);
   }
 
   @keyframes pulse {
     from { transform: scale(1); }
-    to { transform: scale(1.05); }
+    to { transform: scale(1.02); }
   }
 </style>

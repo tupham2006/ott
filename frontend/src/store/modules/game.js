@@ -10,27 +10,15 @@ const state = {
 
 const mutations = {
   storeGame(state, data) {
-    Object.assign(state, data);
-  },
-  activePowerMode (state) {
-    state.player.mana -= 1;
-    state.player.mode = 'power';
+    let i;
+    for(i in data) {
+      state[i] = data[i];
+    }
     return state;
   },
-  attack (state) {
-    state.player.mode = "";
-  }
 };
 
 const actions = {
-  getNewGame: async function(context) {
-    const response = await Vue.axios.get('/data.json');
-    context.commit('storeGame', {
-      player: response.data.player,
-      game: response.data.game[1]
-    });
-    return true;
-  }
 };
 
 export default {

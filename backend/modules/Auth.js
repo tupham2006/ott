@@ -36,24 +36,15 @@ module.exports = ($) => {
     $.modules.Chat.getChatList();
   };
 
-  let auth = (socket, cookies) => {
-    if(!cookies || !cookies.user) return false;
-    var user = cookies.user;
-    if($.data.clients[socket.id] && $.data.clients[socket.id].id == user.id) {
-      return $.data.sessions[user.id];
-    }
-    return false
-  };
-
-  let updateUser = (socket, payload) => {
-    let user = auth(socket, payload.cookies);
-    if(!user) return false;
-    let params = payload.params;
-    let i;
-    for(i in params){
-      user[i] = params[i];
-    }
+  let updateUser = async (socket, payload) => {
+    $result = await $.models.User.updateOne({
+      sid: socket.id
+    },{
+      name: payload.params.name
+    }).exec();
+    user = await $.models.User.findOne({ sid: socket.id }).exec();
     socket.emit("$updateUser", user);
+    $.modules.Chat.getChatList();
   };
 
   return {

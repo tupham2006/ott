@@ -1,5 +1,5 @@
 <template>
-  <Background :page="'select'" :id="game.background">
+  <Background v-if="game.players" :page="'select'" :id="game.background">
     <div class="troller-name">
       <span v-for="(item, key) in game.players" :key="'player-' + key">
         {{ item.troller_name }}
@@ -9,10 +9,35 @@
       <Troller class="troller-1" :face="game.players[user.id].troller_id" />
       <Troller class="troller-2" :face="game.players[game.user_id_maps[user.id]].troller_id" />
     </div>
+    <div class="foot-content">
+      <button type="button" class="btn btn-danger btn-lg mr-4 float-left" @click="exitGame()">
+        {{ trans('select', 'exitGame') }}
+      </button>
+      <button v-if="!game.players[user.id].is_ready" type="button" class="btn btn-success btn-lg float-left" @click="setReadyGame(1)">
+        {{ trans('select', 'readyButton') }}
+      </button>
+      <button v-if="game.players[user.id].is_ready" type="button" class="btn btn-danger btn-lg float-left" @click="setReadyGame(0)">
+        {{ trans('select', 'cancelReadyButton') }}
+      </button>
+      <span class="text-white shadow-danger font-18">
+        <Fa class="text-danger" :icon="['fas', 'gamepad']"/> {{ trans('select', 'readyNoti') }}
+      </span>
+      <button v-if="game.players[game.user_id_maps[user.id]].is_ready" type="button" class="btn btn-success btn-lg float-right">
+        {{ trans('select', 'enemyReadyButton') }}
+      </button>
+      <button v-if="!game.players[game.user_id_maps[user.id]].is_ready" type="button" class="btn btn-light btn-lg float-right">
+        {{ trans('select', 'waitEnemyReadyButton') }}
+      </button>
+    </div>
     <div class="select-troller-container">
       <div class="d-flex justify-content-center">
-        <div v-for="(item, key) in trollList" :key="'troller-' + key" @click="selectTroller(item.id, item.name)">
-          <Avatar :type="'troller'" :id="item.id" class="troller-avatar" :is_selected="game.players[user.id].troller_id == item.id"/>
+        <div v-for="(item, key) in trollList" :key="'troller-' + key" @click="selectTroller(item.troller_id)" :id="`troller-index-${item.troller_id}`">
+          <Avatar :type="'troller'" :id="item.troller_id" class="troller-avatar" :is_selected="game.players[user.id].troller_id == item.troller_id"/>
+          <div>
+            <b-popover triggers="hover focus" placement="top" :target="`troller-index-${item.troller_id}`">
+            <TrollerIndex :troller="item"/>
+          </b-popover>
+          </div>
         </div>
       </div>
       <div class="d-flex justify-content-center">
@@ -21,6 +46,14 @@
         </div>
       </div>
     </div>
+    <Confirm :confirmOpen.sync="confirmExit" :body="trans('select', 'confirmExitBody')" @confirm="isConfirmExit()"/>
+    <Confirm
+      :confirmOpen.sync="notiGameIsCancel"
+      :title="trans('select', 'notiTitle')"
+      :body="trans('select', 'notiGameIsCancel')"
+      :okTitle="trans('select', 'backToRoom')"
+      @confirm="backToRoom()"
+    />
   </Background>
 </template>
 <script>
@@ -28,19 +61,25 @@ import Background from '@/components/Background.vue';
 import { mapState } from 'vuex';
 import Avatar from '@/components/Avatar.vue';
 import Troller from '@/components/Troller';
+import TrollerIndex from '@/components/TrollerIndex';
+import Confirm from '@/components/Confirm';
 
 export default {
   name: 'Select',
   data() {
     return {
       trollList: {},
-      backgroundList: {}
+      backgroundList: {},
+      confirmExit: false,
+      notiGameIsCancel: false
     };
   },
   components: {
     Background,
     Avatar,
-    Troller
+    Troller,
+    Confirm,
+    TrollerIndex
   },
   computed: {
     ...mapState({
@@ -49,33 +88,55 @@ export default {
     })
   },
   methods: {
-    selectTroller(id, name) {
+    selectTroller(troller_id) {
       let i;
       for(i in this.trollList) {
         if (this.trollList[i].is_selected) {
           delete this.trollList[i].is_selected;
-          break;
+        }
+        if(this.trollList[i].troller_id == troller_id) {
+          this.mergeObject(this.game.players[this.user.id], this.trollList[i]);
         }
       }
-      this.game.players[this.user.id].troller_id = id;
-      this.game.players[this.user.id].troller_name = name;
       this.$forceUpdate();
-      this.$socket.emit('selectTroller', this.socketPayload({troller_id: id}));
+      this.$socket.emit('selectTroller', this.socketPayload({troller_id: troller_id}));
     },
     selectBackground(id) {
       this.game.background = id;
       this.$forceUpdate();
       this.$socket.emit('selectBackground', this.socketPayload({background: id}));
+    },
+    exitGame() {
+      this.confirmExit = true;
+      this.$forceUpdate();
+    },
+    async isConfirmExit () {
+      window.console.log("this.confirmExit", this.confirmExit);
+      await this.request('/exitGame', 'post');
+      this.$router.push('/room');
+    },
+    backToRoom() {
+      this.$router.push('/room');
+    },
+    setReadyGame (isReady) {
+      this.game.players[this.user.id].is_ready = isReady;
+      this.$socket.emit('setReadyGame', this.socketPayload({is_ready: isReady}));
+      this.$forceUpdate();
     }
   },
   async created() {
-    if(!this.game.players) {
-      this.$router.push('/room');
-    }
+
     let response = await this.request('/select') || {};
 
     this.trollList = response.trollList || {};
     this.backgroundList = response.backgroundList || {};
+    if(response.game) {
+      this.$store.commit('game/storeGame', response.game);
+    }
+    this.$forceUpdate();
+    if(!this.game.players) {
+      this.$router.push('/room');
+    }
   },
   sockets : {
     $selectTroller(res) {
@@ -85,6 +146,17 @@ export default {
     $selectBackground(res) {
       this.$store.commit('game/storeGame', res);
       this.$forceUpdate();
+    },
+    $gameIsCancel() {
+      this.notiGameIsCancel = true;
+      this.$forceUpdate();
+    },
+    $setReadyGame (res) {
+      this.$store.commit('game/storeGame', res);
+      this.$forceUpdate();
+    },
+    $startGame () {
+      this.$router.push('/game');
     }
   },
 }
@@ -110,14 +182,23 @@ export default {
   }
   .troller-1 {
     position: absolute;
-    left: 100px
+    left: 50px
   }
   .troller-2 {
     position: absolute;
-    right: 100px;
+    right: 50px;
     transform: rotateY(180deg);
     -moz-transform:rotateY(180deg);
     -o-transform:rotateY(180deg);
     -ms-transform:rotateY(180deg);
+  }
+  .foot-content {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+    width: 100%;
+    text-align: center;
+    line-height: 48px;
   }
 </style>

@@ -1,6 +1,6 @@
 <template>
-  <Background :page="'room'" id="room">
-    <div class="room-content">
+  <Background :page="'room'">
+    <div class="room-content" id="room">
       <div class="row mb-5">
         <label class="label-control col-4">
           {{ trans('room', 'name') }}
@@ -19,11 +19,9 @@
           <table class="table">
             <thead>
               <tr>
-                <th>
+                <th colspan="3">
                   {{ trans('room', 'onlineList') }}
                 </th>
-                <th></th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -88,7 +86,7 @@ export default {
   computed: {
     ...mapState({
       user: (state) => state.user,
-      chat: (state) => state.chat,
+      chat: (state) => state.chat.chatList,
     })
   },
   components: {
@@ -106,6 +104,7 @@ export default {
     },
     updateUserName() {
       this.$socket.emit('updateUser', this.socketPayload({name: this.user.name}));
+      this.$toastr.s(this.trans('room', 'updateUserNameSuccess'));
     },
     inviteGame(id) {
       this.$socket.emit('inviteGame', this.socketPayload({id: id}));
@@ -120,8 +119,7 @@ export default {
       this.inviter.name = res.name;
       this.confirmInviteModal = true;
     },
-    $createGame(res) {
-      this.$store.commit('game/storeGame', res);
+    $createGame() {
       this.$router.push('/select');
     }
   },
@@ -131,7 +129,7 @@ export default {
 </script>
 <style scoped>
   #room, #room table {
-    color: #FFF;
+    color: #FFF !important;
   }
   .room-content {
     width: 40%;

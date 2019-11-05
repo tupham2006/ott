@@ -3,6 +3,8 @@ import Vue from 'vue';
 // Import config
 import config from './config';
 Vue.prototype.$config = config;
+import './common.css';
+import './styles.css';
 
 // Bootstrap
 import BootstrapVue from 'bootstrap-vue';
@@ -46,11 +48,18 @@ import VueAxios from 'vue-axios';
 Vue.use(VueAxios, axios);
 Vue.prototype.$axios = axios;
 
+// Toastr
+import VueToastr from "vue-toastr";
+Vue.use(VueToastr, {
+  defaultTimeout: 1000,
+  defaultProgressBar: false
+});
 
 // Export module
 export default {
   BootstrapVue,
   store,
   library,
-  router
+  router,
+  VueToastr
 };

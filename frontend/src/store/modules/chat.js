@@ -1,9 +1,10 @@
 const state = {
+  chatList: []
 };
 
 const mutations = {
   getChatList(state, data) {
-    state = Object.assign([], data);
+    state.chatList = data;
   }
 };
 

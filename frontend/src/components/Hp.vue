@@ -1,9 +1,9 @@
 <template>
   <div>
-    <b-progress :class="{'reverse': reverse}" class="hp" :max="hp" reverse>
-      <b-progress-bar v-if="currentHp/hp >= 0.5" :value="currentHp" variant="success"></b-progress-bar>
-      <b-progress-bar v-if="currentHp/hp < 0.5 && currentHp/hp >= 0.2" :value="currentHp" variant="warning"></b-progress-bar>
-      <b-progress-bar v-if="currentHp/hp < 0.2" :value="currentHp" variant="danger"></b-progress-bar>
+    <b-progress :class="{'reverse': reverse}" class="hp" :max="max_hp" reverse>
+      <b-progress-bar v-if="hp/max_hp >= 0.5" :value="hp" variant="success"></b-progress-bar>
+      <b-progress-bar v-if="hp/max_hp < 0.5 && hp/max_hp >= 0.2" :value="hp" variant="warning"></b-progress-bar>
+      <b-progress-bar v-if="hp/max_hp < 0.2" :value="hp" variant="danger"></b-progress-bar>
     </b-progress>
   </div>
 </template>
@@ -12,10 +12,10 @@
 export default {
   name: 'Hp',
   props: {
-    'hp': {
+    'max_hp': {
       type: Number
     },
-    'currentHp': {
+    'hp': {
       type: Number
     },
     'reverse': {
@@ -28,8 +28,5 @@ export default {
   .hp {
     width: 300px;
     height: 25px;
-  }
-  .reverse {
-    transform: rotate(180deg);
   }
 </style>

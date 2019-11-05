@@ -1,33 +1,37 @@
 module.exports = ($) => {
-  const trollers = require($.basePath + '/data/trollers.json');
-  const backgrounds = require($.basePath + '/data/backgrounds.json');
-  let inviteGame = (socket, payload) => {
-    let user = $.data.sessions[payload.params.id];
+  let inviteGame = async (socket, payload) => {
+    user = await $.models.User.findOne({ id: payload.params.id}).exec();
     if(!user) return false;
-    let inviter = $.data.sessions[$.data.clients[socket.id].id];
-
-    user['invite_list'][inviter.id] = inviter;
-
+    inviter = await $.models.User.findOne({ sid: socket.id}).exec();
+    if(!inviter) return false;
+    user['invite_list'].push(inviter.id);
+    await $.models.User.updateOne({ _id: user._id }, { invite_list: user['invite_list'] }).exec();
     $.io.to(user.sid).emit('$confirmInvite', {id: inviter.id, name: inviter.name});
   };
 
-  let acceptInvite = (socket, payload) => {
-    let user = $.data.sessions[$.data.clients[socket.id].id];
-    let inviter = $.data.sessions[payload.params.id];
-    if(!user['invite_list'][inviter.id]) return false;
-    delete user['invite_list'][inviter.id];
-    let gameData = createGame(user, inviter);
-    user['game_id'] = inviter['game_id'] = gameData.id;
-    socket.emit("$createGame", gameData);
-    $.io.to(inviter.sid).emit("$createGame", gameData);
-    $.io.to(user.sid).emit("$updateUser", user);
-    $.io.to(inviter.sid).emit("$updateUser", inviter);
+  let acceptInvite = async (socket, payload) => {
+    user = await $.models.User.findOne({ sid: socket.id}).exec();
+    inviter = await $.models.User.findOne({ id: payload.params.id}).exec();
+    if(!user || !inviter || user['invite_list'].indexOf(inviter.id) == -1) {
+      return false;
+    }
+    user['invite_list'] = user['invite_list'].filter(item => {
+      return item != inviter.id;
+    });
+
+    let gameData = await createGame(user, inviter);
+    await new $.models.Game(gameData).save();
+    await $.models.User.updateOne({ _id: user._id }, {game_id: gameData.id, invite_list: user['invite_list'] }).exec();
+    await $.models.User.updateOne({ _id: inviter._id }, {game_id: gameData.id}).exec();
+    socket.emit("$createGame");
+    $.io.to(inviter.sid).emit("$createGame");
   };
 
-  let createGame = (user, inviter) => {
+  let createGame = async (user, inviter) => {
     let gameId = $.data.games.length;
+    let id = await $.Common.newId($.models.Game);
     let gameData = {
-      id: gameId,
+      id: id,
       players: {
 
       },
@@ -44,50 +48,72 @@ module.exports = ($) => {
 
     gameData.user_id_maps[inviter.id] = user.id;
     gameData.user_id_maps[user.id] = inviter.id;
+    let troller = await $.models.Troller.findOne({ troller_id: 1 }, {_id: 0, __v: 0}).exec();
+    troller = troller.toJSON();
 
-    gameData.players[user.id] = {
+    gameData.players[user.id] = $.Common.mergeObject({
       id: user.id,
       name:user.name,
-      troller_id: 1,
-      troller_name: trollers[1].name
-    }
+      is_ready: 0,
+    }, troller);
 
-    gameData.players[inviter.id] = {
+    gameData.players[inviter.id] = $.Common.mergeObject({
       id: inviter.id,
       name: inviter.name,
-      troller_id: 1,
-      troller_name: trollers[1].name
-    }
+      is_ready: 0
+    }, troller);
 
-    $.data.games.push(gameData);
     return gameData;
   };
 
-  let getTrollList = () => {
+  let getTrollList = async () => {
+    let trollers = await $.models.Troller.find().exec();
     return trollers;
   };
 
-  let getBackgroundList = () => {
+  let getBackgroundList = async () => {
+    let backgrounds = await $.models.Background.find().exec();
     return backgrounds;
   };
 
-  let selectTroller = (socket, payload) => {
-    let games = $.data.games;
-    let user = $.Common.userBySocket(socket);
-    let gameData = games[user.game_id];
-    gameData.players[user.id].troller_id = payload.params.troller_id;
-    gameData.players[user.id].troller_name = trollers[payload.params.troller_id].name;
-    let userId2 = gameData['user_id_maps'][user.id];
-    $.io.to($.data.sessions[userId2].sid).emit("$selectTroller", gameData);
+  let selectTroller = async (socket, payload) => {
+    let user = await $.models.User.findOne({ sid: socket.id }).exec();
+    let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
+    let troller = await $.models.Troller.findOne({ troller_id: payload.params.troller_id }, {_id: 0, __v: 0}).exec();
+    troller = troller.toJSON();
+    if(!gameData) {
+      return false;
+    }
+    $.Common.mergeObject(gameData.players[user.id], troller);
+
+    await $.models.Game.updateOne({ _id: gameData._id}, {players: gameData.players }).exec();
+    let userId2 = await $.models.User.findOne({ id: gameData['user_id_maps'][user.id] }).exec();
+    $.io.to(userId2.sid).emit("$selectTroller", gameData);
   }
 
-  let selectBackground = (socket, payload) => {
-    let games = $.data.games;
-    let user = $.Common.userBySocket(socket);
-    let gameData = games[user.game_id];
+  let selectBackground = async (socket, payload) => {
+    let user = await $.models.User.findOne({ sid: socket.id }).exec();
+    let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
     gameData.background = payload.params.background;
-    let userId2 = gameData['user_id_maps'][user.id];
-    $.io.to($.data.sessions[userId2].sid).emit("$selectBackground", gameData);
+    await $.models.Game.updateOne({ _id: gameData._id}, {background: gameData.background}).exec();
+    let userId2 = await $.models.User.findOne({ id: gameData['user_id_maps'][user.id] }).exec();
+    $.io.to(userId2.sid).emit("$selectBackground", gameData);
+  }
+
+  let setReadyGame = async (socket, payload) => {
+    let user = await $.models.User.findOne({ sid: socket.id }).exec();
+    if(!user) return false;
+    let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
+    if(!gameData) return false;
+    gameData.players[user.id].is_ready = payload.params.is_ready;
+    await $.models.Game.updateOne({ _id: gameData._id }, { players: gameData.players }).exec();
+    let userId2 = await $.models.User.findOne({ id: gameData['user_id_maps'][user.id] }).exec();
+    if(gameData.players[gameData['user_id_maps'][user.id]].is_ready) {
+      $.io.to(user.sid).emit("$startGame", gameData);
+      $.io.to(userId2.sid).emit("$startGame", gameData);
+      return true;
+    }
+    $.io.to(userId2.sid).emit("$setReadyGame", gameData);
   }
 
   return {
@@ -96,6 +122,7 @@ module.exports = ($) => {
     getTrollList,
     getBackgroundList,
     selectTroller,
-    selectBackground
+    selectBackground,
+    setReadyGame
   };
 }

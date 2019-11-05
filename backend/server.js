@@ -15,11 +15,11 @@ var $ = {
   models: {}
 };
 
-$.Common = require('./modules/Common')($);
 $.basePath = __dirname;
 const Auth = $.modules.Auth = require('./modules/Auth')($);
 const Chat = $.modules.Chat = require('./modules/Chat')($);
 const Game = $.modules.Game = require('./modules/Game')($);
+$.Common = require('./modules/Common')($);
 
 /**
  * Http
@@ -34,7 +34,11 @@ let server = new express()
   .use(express.json())
   .use(express.urlencoded({ extended: false }))
   .use(express.static(path.join(__dirname, 'public')))
-  .use(cors())
+  .use(cors({
+    credentials: true,
+    origin: true,
+    methods: "GET,POST",
+  }))
   .use('/', require('./routes')($, Game))
   .listen(8081);
 $.db.connect('mongodb://localhost:27017/ott', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -46,7 +50,12 @@ $.db.connection.once('open',function(){
 });
 
 $.models.User = require($.basePath + '/models/User')($);
+$.models.Background = require($.basePath + '/models/Background')($);
+$.models.Troller = require($.basePath + '/models/Troller')($);
+$.models.Game = require($.basePath + '/models/Game')($);
 
+// Seeding
+$.Common.seed();
 /**
  * Socket IO
  */
@@ -70,6 +79,7 @@ $.io.on("connection", (socket) => {
   // Play game
   socket.on("inviteGame", payload => { Game.inviteGame(socket, payload); });
   socket.on("acceptInvite", payload => { Game.acceptInvite(socket, payload); });
-  socket.on("selectTroller", payload =>{ Game.selectTroller(socket, payload); });
-  socket.on("selectBackground", payload =>{ Game.selectBackground(socket, payload); });
+  socket.on("selectTroller", payload => { Game.selectTroller(socket, payload); });
+  socket.on("selectBackground", payload => { Game.selectBackground(socket, payload); });
+  socket.on("setReadyGame", payload => { Game.setReadyGame(socket, payload); });
 });
