@@ -70,6 +70,6 @@ export default {
     },
   },
   server: {
-    port: 9999
+    port: 9300
   }
 }

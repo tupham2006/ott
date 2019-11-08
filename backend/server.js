@@ -40,7 +40,7 @@ let server = new express()
     methods: "GET,POST",
   }))
   .use('/', require('./routes')($, Game))
-  .listen(10000);
+  .listen(9301);
 $.db.connect('mongodb://localhost:27017/ott', { useNewUrlParser: true, useUnifiedTopology: true });
 $.db.connection.on('error',() => {
   console.log("Error in database connection")
