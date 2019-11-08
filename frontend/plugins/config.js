@@ -1,3 +1,3 @@
 export default {
-  serverOrigin: "http://localhost:1200"
+  serverOrigin: "http://localhost:90"
 };
