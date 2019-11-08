@@ -68,5 +68,8 @@ export default {
         alias[`@${aliasList[i]}`] = path.join(rootDir, aliasList[i]);
       }
     },
+  },
+  server: {
+    port: 9999
   }
 }
