@@ -1,0 +1,34 @@
+#select {
+  width: 100%;
+  height: 100%;
+}
+.troller-avatar {
+  margin: 5px;
+}
+
+.select-troller-container {
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+}
+.troller-name {
+  padding: 10px;
+  color: #fff;
+  font-size: 30px;
+  text-shadow: 1px 0 0 #000, -1px 0 0 #000, 0 1px 0 #000, 0 -1px 0 #000, 1px 1px #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+}
+.troller-name span:nth-child(2) {
+  float: right;
+}
+.troller-1 {
+  position: absolute;
+  left: 50px
+}
+.troller-2 {
+  position: absolute;
+  right: 50px;
+  transform: rotateY(180deg);
+  -moz-transform:rotateY(180deg);
+  -o-transform:rotateY(180deg);
+  -ms-transform:rotateY(180deg);
+}

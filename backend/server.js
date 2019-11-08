@@ -8,7 +8,7 @@ var $ = {
   data: {
     sessions: {},
     clients: {},
-    games: [null]
+    atk_waitings: {}
   },
   db: mongoose,
   modules: {},
@@ -82,4 +82,5 @@ $.io.on("connection", (socket) => {
   socket.on("selectTroller", payload => { Game.selectTroller(socket, payload); });
   socket.on("selectBackground", payload => { Game.selectBackground(socket, payload); });
   socket.on("setReadyGame", payload => { Game.setReadyGame(socket, payload); });
+  socket.on("attack", payload => { Game.attack(socket, payload); });
 });

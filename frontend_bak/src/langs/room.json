@@ -1,0 +1,35 @@
+{
+  "name": [
+    "Tên bạn"
+  ],
+  "changeName": [
+    "Đổi tên"
+  ],
+  "onlineList": [
+    "Danh sách đã, đang và sẽ vả nhau",
+    "Danh sách chờ vả"
+  ],
+  "inviteGame": [
+    "Mời vả",
+    "Khiêu chiến"
+  ],
+  "backButton": [
+    "Về trang chính",
+    "Quay lại"
+  ],
+  "you": [
+    "Bạn"
+  ],
+  "inviteBodyModal": [
+    "giấu tên đang muốn vả nhau với bạn."
+  ],
+  "okInviteModal": [
+    "Vả luôn"
+  ],
+  "okInviteModal2": [
+    "Vẫn vả, nhưng màu xanh"
+  ],
+  "updateUserNameSuccess": [
+    "Đổi tên thành công"
+  ]
+}

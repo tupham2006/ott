@@ -1,0 +1,51 @@
+<template>
+  <div class="background" :style="backgroundStyle">
+    <slot></slot>
+  </div>
+</template>
+<script>
+
+export default {
+  name: 'Background',
+  props: {
+    page: {
+      type: String
+    },
+    id: {
+    }
+  },
+  computed: {
+    url() {
+      let url = '';
+      switch(this.page) {
+        case 'home':
+          url = require(`@/assets/images/${this.page}/background.jpg`);
+          break;
+        case 'select':
+          url = this.serverLink(`/game/backgrounds/${this.id}.jpg`);
+          break;
+        case 'room':
+          url = require(`@/assets/images/${this.page}/background.jpg`);
+          break;
+      }
+      return url;
+    },
+    backgroundStyle() {
+      return {
+        background: `url(${this.url}) 0% 0% / cover no-repeat`
+      };
+    }
+  },
+  created() {
+    if(this.page == 'select' && !this.id) {
+      this.$router.push('/room');
+    }
+  }
+}
+</script>
+<style scoped>
+  .background {
+    width: 100%;
+    height: 100%;
+  }
+</style>

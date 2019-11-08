@@ -1,0 +1,50 @@
+[
+  {
+    "troller_id": 1,
+    "troller_name": "Troll",
+    "max_hp": 1000,
+    "hp": 1000,
+    "min_atk": 100,
+    "max_atk": 100,
+    "desc": "Thường man",
+    "unti_name": "Cú vả thần thánh",
+    "unti_desc": "Cú vả tiếp theo gây <span class=\"text-danger\">300</span> sát thương. Nếu đối phương đỡ được chiêu này, chỉ tính <span class=\"text-info\">100</span> sát thương.",
+    "unti_time": 1
+  },
+  {
+    "troller_id": 2,
+    "troller_name": "Are you f******* kidding me",
+    "max_hp": 1000,
+    "hp": 1000,
+    "min_atk": 100,
+    "max_atk": 150,
+    "desc": "Đây là một thanh niên nghiêm khắc, nổi tiếng bởi những cú vả mạnh mẽ, crit sát thương lên tận nóc.",
+    "unti_name": "Bật chế độ thanh niên nghiêm khắc.",
+    "unti_desc": "Tăng thêm <span class=\"text-danger\">1000%</span>(Tối đa <span class=\"text-danger\">50</span>) sát thương, nhận tỉ lệ chí mạng <span class=\"text-danger\">1000%</span> trong <span class=\"text-info\">10</span> giây.",
+    "unti_time": 1
+  },
+  {
+    "troller_id": 3,
+    "troller_name": "Poker",
+    "max_hp": 1200,
+    "hp": 1200,
+    "min_atk": 90,
+    "max_atk": 110,
+    "desc": "Mô tả đơn giản bằng 2 từ: \"To xác\" và \"Nhiều máu\"",
+    "unti_name": "Mình đồng da sắt",
+    "unti_desc": "Hóa khổng lồ. Hồi phục lại <span class=\"text-info\">40%</span> máu đã mất.",
+    "unti_time": 1
+  },
+  {
+    "troller_id": 4,
+    "troller_name": "Epic win",
+    "max_hp": 1000,
+    "hp": 900,
+    "min_atk": 70,
+    "max_atk": 90,
+    "desc": "Yếu đến mức vào trận đã tự động mất 100 máu. Điểm mạnh của thanh niên này nằm ở tính đa dụng.",
+    "unti_name": "3 tầng sức mạnh",
+    "unti_time": 3,
+    "unti_desc": "Tầng 1 - Lời nguyện cầu: Hồi phục <span class=\"text-info\">50%</span> số sát thương vừa gánh chịu. <br/> Tầng 2 - Khoá, khoá, khoá và khoá: Khoá 1 chiêu của đối thủ, khoá sử dụng chiêu cuối trong <span class=\"text-info\">10</span> giây.<br/> Tầng 3 - Đồng tử nhất sinh: Hy sinh <span class=\"text-danger\">50%</span> số lượng máu để làm choáng đối thủ, trong 3 đòn tiếp theo đối phương không thể làm gì. Sát thương gây ra từ <span class=\"text-info\">10</span>-<span class=\"text-danger\">200</span>"
+  }
+]

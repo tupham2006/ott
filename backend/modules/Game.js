@@ -28,14 +28,13 @@ module.exports = ($) => {
   };
 
   let createGame = async (user, inviter) => {
-    let gameId = $.data.games.length;
     let id = await $.Common.newId($.models.Game);
     let gameData = {
       id: id,
       players: {
 
       },
-      status: 0,
+      status: 1,
       background: 1,
       player_maps: {
         1: inviter.id,
@@ -116,6 +115,63 @@ module.exports = ($) => {
     $.io.to(userId2.sid).emit("$setReadyGame", gameData);
   }
 
+  let attack = async (socket, payload) => {
+    let user = await $.models.User.findOne({ sid: socket.id }).exec();
+    let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
+    gameData.players[user.id].cur_atk_id = payload.params.cur_atk_id;
+    await $.models.Game.updateOne({ id: user.game_id}, { players: gameData.players }).exec();
+
+    if(!$.data.atk_waitings[user.game_id]) {
+      $.data.atk_waitings[user.game_id] = true;
+      setTimeout(async function(){
+        let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
+        gameData.players[user.id].cur_atk_id = payload.params.cur_atk_id;
+        let player1 = gameData.players[user.id];
+        let player2 = gameData.players[gameData.user_id_maps[user.id]];
+        compareAttack(player1, player2);
+        // Auto reset attack after 2 seconds
+        let userId2 = await $.models.User.findOne({ id: gameData['user_id_maps'][user.id] }).exec();
+        if(player1.hp == 0 || player2.hp == 0) {
+          gameData.status = 0;
+          if(player1.hp == player2.hp) {
+            gameData.result = 3;
+          }
+          gameData.result = player1.hp > player2.hp ? player1.id : player2.id;
+        }
+        $.io.to(user.sid).emit("$attack", gameData);
+        $.io.to(userId2.sid).emit("$attack", gameData);
+        player1.cur_atk_id = null;
+        player2.cur_atk_id = null;
+        await $.models.Game.updateOne({ id: user.game_id },  gameData).exec();
+        delete $.data.atk_waitings[user.game_id];
+      }, 500);
+    }
+  };
+
+  let compareAttack = (player1, player2) => {
+    normalAttack(player1, player2);
+  };
+
+  let normalAttack = (player1, player2) => {
+    if(player1.cur_atk_id == player2.cur_atk_id) {
+      return true;
+    }
+
+    player1Win = (player1.cur_atk_id == 1 && player2.cur_atk_id == 2) ||
+                (player1.cur_atk_id == 2 && player2.cur_atk_id == 3) ||
+                (player1.cur_atk_id == 3 && player2.cur_atk_id == 1) ||
+                (player1.cur_atk_id && !player2.cur_atk_id);
+    if(player1Win) {
+      player1.last_atk = $.Common.random(player1.min_atk, player1.max_atk);
+      player2.hp -= player1.last_atk;
+      player2.hp = player2.hp > 0 ? player2.hp : 0
+    } else {
+      player2.last_atk = $.Common.random(player2.min_atk, player2.max_atk);
+      player1.hp -= player2.last_atk;
+      player1.hp = player1.hp > 0 ? player1.hp : 0
+    }
+  }
+
   return {
     inviteGame,
     acceptInvite,
@@ -123,6 +179,7 @@ module.exports = ($) => {
     getBackgroundList,
     selectTroller,
     selectBackground,
-    setReadyGame
+    setReadyGame,
+    attack
   };
 }

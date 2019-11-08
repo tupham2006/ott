@@ -1,0 +1,12 @@
+<section class="confirm">
+  <b-modal v-model="isModalOpen" :title="title">
+    <p class="my-4">
+      {{ body }}
+    </p>
+    <div slot="modal-footer">
+      <button class="btn btn-danger mr-2" @click="confirm()">{{ okTitle }}</button>
+      <button class="btn btn-light" @click="close()">{{ closeTitle }}</button>
+    </div>
+  </b-modal>
+</section>
+

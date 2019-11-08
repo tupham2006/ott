@@ -6,7 +6,8 @@ module.exports = ($) => {
     background: Number,
     player_maps: Object,
     user_id_maps: Object,
-    is_ready: Number
+    is_ready: Number,
+    result: Number
   });
 
   return $.db.model('games', games);

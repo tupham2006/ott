@@ -1,0 +1,52 @@
+{
+  "exitGame": [
+    "Thoát game"
+  ],
+  "confirmExitBody": [
+    "Bạn có muốn thoát game? Sau khi thoát, mọi thứ sẽ chấm dứt!",
+    "Bạn chắc chắn thoát game chứ?",
+    "Mọi thứ sẽ chấm dứt sau khi bạn ấn OK"
+  ],
+  "notiGameIsCancel": [
+    "Game đã không còn! Vui lòng về phòng chờ để bắt đầu trận đấu mới."
+  ],
+  "backToRoom": [
+    "Về phòng chờ"
+  ],
+  "notiTitle": [
+    "Thông báo"
+  ],
+  "readyButton": [
+    "Sẵn sàng"
+  ],
+  "cancelReadyButton": [
+    "Huỷ sẵn sàng"
+  ],
+  "waitEnemyReadyButton": [
+    "Chờ đối thủ sẵn sàng"
+  ],
+  "enemyReadyButton": [
+    "Đối thủ đã sẵn sàng"
+  ],
+  "readyNoti": [
+    "Game sẽ bắt đầu khi cả 2 nhất nút sẵn sàng"
+  ],
+  "trollerName": [
+    "Tên"
+  ],
+  "trollerAtk": [
+    "Sát thương"
+  ],
+  "trollerHp": [
+    "Máu"
+  ],
+  "trollerDesc": [
+    "Nhân vật"
+  ],
+  "trollerUnti": [
+    "Chiêu cuối"
+  ],
+  "trollerUntiTime": [
+    "Số lần dùng"
+  ]
+}
