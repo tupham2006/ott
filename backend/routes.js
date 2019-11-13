@@ -18,6 +18,7 @@ module.exports = ($, Game) => {
         let user = await $.models.User.findOne({ id: ott.user.id, _id: ott.user._id }).exec();
         if(user && user.game_id) {
           data.game = await $.models.Game.findOne({ id: user.game_id }).exec();
+          data.user = user;
         }
       }
     }

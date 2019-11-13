@@ -32,18 +32,22 @@ export default {
   methods: {
     selectTroller(troller_id) {
       let i;
+      let playerState = this._.cloneDeep(this.game.players[this.user.id], true);
       for(i in this.trollList) {
         if (this.trollList[i].is_selected) {
           delete this.trollList[i].is_selected;
         }
         if(this.trollList[i].troller_id == troller_id) {
-          this.mergeObject(this.game.players[this.user.id], this.trollList[i]);
+          this.mergeObject(playerState, this.trollList[i]);
         }
       }
+      let updateData = {};
+      updateData[this.user.id] = playerState;
+      this.$store.commit('game/updatePlayer', updateData);
       this.$socket.emit('selectTroller', this.socketPayload({troller_id: troller_id}));
     },
     selectBackground(id) {
-      this.game.background = id;
+      this.$store.commit('game/storeGame', {background: id});
       this.$socket.emit('selectBackground', this.socketPayload({background: id}));
     },
     exitGame() {
@@ -57,7 +61,11 @@ export default {
       this.$router.push('/room');
     },
     setReadyGame (isReady) {
-      this.game.players[this.user.id].is_ready = isReady;
+      let playerState = this._.cloneDeep(this.game.players[this.user.id], true);
+      playerState.is_ready = isReady;
+      let updateData = {};
+      updateData[this.user.id] = playerState;
+      this.$store.commit('game/updatePlayer', updateData);
       this.$socket.emit('setReadyGame', this.socketPayload({is_ready: isReady}));
     }
   },
@@ -70,7 +78,11 @@ export default {
     if(response.game) {
       this.$store.commit('game/storeGame', response.game);
     }
-      console.log("this.game", this.game);
+
+    if(response.user) {
+      this.$store.commit('user/updateUser', response.user);
+    }
+
     if(!this.game.players) {
       this.$router.push('/room');
     }

@@ -1,5 +1,5 @@
 <template>
-  <div class="unti" v-bind:style="style"></div>
+  <div class="unti" v-bind:style="style" @click="useUnti"></div>
 </template>
 <script>
 
@@ -23,6 +23,9 @@ export default {
     }
   },
   methods: {
+    useUnti () {
+      this.$emit('useUnti');
+    }
   },
 }
 </script>

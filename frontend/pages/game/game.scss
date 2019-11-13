@@ -72,4 +72,28 @@
     from {top: -900px; }
     to { top: -600px; }
   }
+
+  .damg, .damg-2 {
+     position: fixed;
+     right: 15%;
+     top: 30%;
+     animation: damg 2s infinite;
+  }
+
+  .damg-2 {
+    color: blue
+  }
+
+  @keyframes damg {
+    0% { top: 30%; }
+    25% { top: 25%; }
+    50% { top: 20%; }
+    75% { top: 17%; }
+    100% { top: 15%; }
+  }
+
+  .timer {
+    font-size: 50px;
+    color: #F00;
+  }
 }

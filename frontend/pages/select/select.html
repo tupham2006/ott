@@ -1,8 +1,11 @@
 <section id="select">
   <Background v-if="game.players" :page="'select'" :id="game.background">
     <div class="troller-name">
-      <span v-for="(item, key) in game.players" :key="'player-' + key">
-        {{ item.troller_name }}
+      <span>
+       {{ game.players[user.id].troller_name }}
+      </span>
+      <span>
+       {{ game.players[game.user_id_maps[user.id]].troller_name }}
       </span>
     </div>
     <div>

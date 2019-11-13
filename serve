@@ -1,0 +1,5 @@
+cd backend
+sudo npm run dev > /dev/null 2>&1&
+cd ..
+cd frontend
+sudo npm run dev

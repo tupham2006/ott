@@ -31,6 +31,7 @@ module.exports = ($) => {
         is_online: 1
       };
       await new $.models.User(user).save();
+      user = await $.models.User.findOne({ id: user.id }).exec();
     }
     socket.emit("$updateUser", user);
     $.modules.Chat.getChatList();

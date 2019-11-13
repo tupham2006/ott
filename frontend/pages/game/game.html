@@ -1,4 +1,4 @@
-<Background v-if="game.players" :page="'select'" :id="game.background">
+<Background v-if="game.players" :page="'select'" :id="game.background" :e_cur_atk="game.players[game.user_id_maps[user.id]].cur_atk">
   <div id="game">
     <div class="header">
       <div class="user-info float-left">
@@ -24,10 +24,11 @@
         </div>
       </div>
     </div>
-     <!-- <div class="d-flex justify-content-center">
-      <Troller class="troller-1" :face="game.players[game.user_id_maps[user.id]].troller_id" />
-     </div> -->
-     <!-- <Unti :troller_id="game.players[user.id].troller_id"/> -->
+     <div class="d-flex justify-content-center">
+      <div class="timer shadow-white" v-if="timer">{{ timer }} </div>
+      <!-- <Troller class="troller-1" :face="game.players[game.user_id_maps[user.id]].troller_id" /> -->
+     </div>
+     <Unti v-if="game.players[user.id].unti_time" :troller_id="game.players[user.id].troller_id" @useUnti="useUnti"/>
       <div class="skill-container d-flex justify-content-center">
         <div v-for="(item, index) in skills" :key="`skills-button-${item.id}`">
           <button type="button" class="btn skill-button btn-success" @click="attack(item.id)" :disabled="atkWait">
@@ -41,6 +42,7 @@
       <div v-for="(item, index) in skills" :key="`skill-${item.id}`">
         <img v-if="game.players[user.id].cur_atk_id == item.id" class="attack" :src="require('@/assets/images/game/skills/' + item.id + '.png')">
       </div>
+      <Damg class="damg" :player="game.players[user.id]" v-if="atkWait"/>
     <div class="foot-content">
       <button type="button" class="btn btn-danger btn-lg mr-4 float-left" @click="backToRoom()">
         {{ trans('game', 'backToRoom') }}

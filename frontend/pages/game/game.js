@@ -5,6 +5,7 @@ import Unti from '@components/Unti.vue';
 import Troller from '@components/Troller';
 import Background from '@components/Background';
 import Confirm from '@components/Confirm';
+import Damg from '@components/Damg';
 
 export default {
   name: 'game',
@@ -26,7 +27,9 @@ export default {
       }],
       atkWait: false,
       isEndGame: false,
-      resultText: ''
+      resultText: '',
+      timer: 3,
+      timerProcess: null
     };
   },
   computed: {
@@ -36,8 +39,21 @@ export default {
     })
   },
   methods: {
+    startTime () {
+      self = this;
+      self.timer = 3;
+      clearInterval(this.timerProcess);
+      this.timerProcess = setInterval(function() {
+        if(self.timer <= 0) {
+          clearInterval(self.timerProcess);
+          return false;
+        }
+        self.timer = self.timer ? self.timer - 1 : 0;
+      }, 1000);
+      this.$socket.emit('new_round', this.socketPayload({ game_id: this.game.id }));
+    },
     attack (id) {
-      this.atkWait = true;
+      self.atkWait = true;
       this.$socket.emit('attack', this.socketPayload({cur_atk_id: id}));
     },
     endGame (result) {
@@ -52,12 +68,17 @@ export default {
     backToRoom() {
       this.$router.push('/room');
     },
+    useUnti () {
+      this.game.players[this.user.id].unti_time -= 1;
+    }
   },
   mounted: async function () {
     let response = await this.request('/select') || {};
     if(response.game) {
-      this.$store.commit('game/storeGame', response.game);
+      this.$store.commit('game/storeGame', this._.cloneDeep(response.game, true));
     }
+    // Start time
+    this.startTime();
   },
   components: {
     Avatar,
@@ -65,21 +86,28 @@ export default {
     Unti,
     Troller,
     Background,
-    Confirm
+    Confirm,
+    Damg
   },
   sockets : {
-    $attack(res) {
-      this.$store.commit('game/storeGame', res);
+    $end_round(res) {
+      this.$store.commit('game/storeGame', this._.cloneDeep(res, true));
       let player1 = res.players[this.user.id];
       let player2 = res.players[res['user_id_maps'][this.user.id]];
       let self = this;
       setTimeout(function(){
-        player2.cur_atk_id = null;
         player1.cur_atk_id = null;
+        player2.cur_atk_id = null;
+        player1.cur_atk = null;
+        player2.cur_atk = null;
+        self.$store.commit('game/storeGame', res);
         self.atkWait = false;
         if(res.status == 0) {
           self.endGame(res.result);
+          return true;
         }
+        // Start time
+        self.startTime();
       }, 500);
     },
   }

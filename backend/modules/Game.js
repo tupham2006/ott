@@ -42,7 +42,8 @@ module.exports = ($) => {
       },
       user_id_maps: {
 
-      }
+      },
+      cur_win_id: 0
     };
 
     gameData.user_id_maps[inviter.id] = user.id;
@@ -115,22 +116,18 @@ module.exports = ($) => {
     $.io.to(userId2.sid).emit("$setReadyGame", gameData);
   }
 
-  let attack = async (socket, payload) => {
-    let user = await $.models.User.findOne({ sid: socket.id }).exec();
-    let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
-    gameData.players[user.id].cur_atk_id = payload.params.cur_atk_id;
-    await $.models.Game.updateOne({ id: user.game_id}, { players: gameData.players }).exec();
-
-    if(!$.data.atk_waitings[user.game_id]) {
-      $.data.atk_waitings[user.game_id] = true;
+  let new_round = async (socket, payload) => {
+    if(!$.data.atk_waitings[payload.params.game_id]) {
+      $.data.atk_waitings[payload.params.game_id] = true;
       setTimeout(async function(){
-        let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
-        gameData.players[user.id].cur_atk_id = payload.params.cur_atk_id;
-        let player1 = gameData.players[user.id];
-        let player2 = gameData.players[gameData.user_id_maps[user.id]];
+        let gameData = await $.models.Game.findOne({ id: payload.params.game_id}).exec();
+        let player1 = gameData.players[Object.keys(gameData.players)[0]];
+        let player2 = gameData.players[Object.keys(gameData.players)[1]];
         compareAttack(player1, player2);
-        // Auto reset attack after 2 seconds
-        let userId2 = await $.models.User.findOne({ id: gameData['user_id_maps'][user.id] }).exec();
+        let user = await $.models.User.findOne({ id: player1.id }).exec();
+        let userId2 = await $.models.User.findOne({ id: player2.id }).exec();
+
+        // Attack
         if(player1.hp == 0 || player2.hp == 0) {
           gameData.status = 0;
           if(player1.hp == player2.hp) {
@@ -138,14 +135,24 @@ module.exports = ($) => {
           }
           gameData.result = player1.hp > player2.hp ? player1.id : player2.id;
         }
-        $.io.to(user.sid).emit("$attack", gameData);
-        $.io.to(userId2.sid).emit("$attack", gameData);
+        gameData.cur_win_id = player1.cur_atk > player2.cur_atk ? player1.id : (player2.cur_atk > player1.cur_atk ? player2.id : 0)
+        $.io.to(user.sid).emit("$end_round", gameData);
+        $.io.to(userId2.sid).emit("$end_round", gameData);
         player1.cur_atk_id = null;
         player2.cur_atk_id = null;
-        await $.models.Game.updateOne({ id: user.game_id },  gameData).exec();
+        player1.cur_atk = null;
+        player2.cur_atk = null;
+        await $.models.Game.updateOne({ id: payload.params.game_id },  gameData).exec();
         delete $.data.atk_waitings[user.game_id];
-      }, 500);
+      }, 4000);
     }
+  }
+
+  let attack = async (socket, payload) => {
+    let user = await $.models.User.findOne({ sid: socket.id }).exec();
+    let gameData = await $.models.Game.findOne({ id: user.game_id}).exec();
+    gameData.players[user.id].cur_atk_id = payload.params.cur_atk_id;
+    await $.models.Game.updateOne({ id: user.game_id}, { players: gameData.players }).exec();
   };
 
   let compareAttack = (player1, player2) => {
@@ -162,12 +169,12 @@ module.exports = ($) => {
                 (player1.cur_atk_id == 3 && player2.cur_atk_id == 1) ||
                 (player1.cur_atk_id && !player2.cur_atk_id);
     if(player1Win) {
-      player1.last_atk = $.Common.random(player1.min_atk, player1.max_atk);
-      player2.hp -= player1.last_atk;
+      player1.cur_atk = $.Common.random(player1.min_atk, player1.max_atk);
+      player2.hp -= player1.cur_atk;
       player2.hp = player2.hp > 0 ? player2.hp : 0
     } else {
-      player2.last_atk = $.Common.random(player2.min_atk, player2.max_atk);
-      player1.hp -= player2.last_atk;
+      player2.cur_atk = $.Common.random(player2.min_atk, player2.max_atk);
+      player1.hp -= player2.cur_atk;
       player1.hp = player1.hp > 0 ? player1.hp : 0
     }
   }
@@ -180,6 +187,7 @@ module.exports = ($) => {
     selectTroller,
     selectBackground,
     setReadyGame,
-    attack
+    attack,
+    new_round
   };
 }

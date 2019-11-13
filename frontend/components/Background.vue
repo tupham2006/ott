@@ -12,6 +12,8 @@ export default {
       type: String
     },
     id: {
+    },
+    e_cur_atk: {
     }
   },
   computed: {
@@ -31,9 +33,13 @@ export default {
       return url;
     },
     backgroundStyle() {
-      return {
+      let style = {
         background: `url(${this.url}) 0% 0% / cover no-repeat`
       };
+      // if(this.e_cur_atk) {
+      //   style.filter = 'saturate(2)';
+      // }
+      return style;
     }
   },
   created() {

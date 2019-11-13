@@ -40,7 +40,7 @@ let server = new express()
     methods: "GET,POST",
   }))
   .use('/', require('./routes')($, Game))
-  .listen(90);
+  .listen(9506);
 $.db.connect('mongodb://localhost:27017/ott', { useNewUrlParser: true, useUnifiedTopology: true });
 $.db.connection.on('error',() => {
   console.log("Error in database connection")
@@ -83,4 +83,5 @@ $.io.on("connection", (socket) => {
   socket.on("selectBackground", payload => { Game.selectBackground(socket, payload); });
   socket.on("setReadyGame", payload => { Game.setReadyGame(socket, payload); });
   socket.on("attack", payload => { Game.attack(socket, payload); });
+  socket.on("new_round", payload => { Game.new_round(socket, payload); });
 });

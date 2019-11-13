@@ -44,3 +44,7 @@ Vue.use(VueToastr, {
   defaultTimeout: 1000,
   defaultProgressBar: false
 });
+
+// Lodash
+import VueLodash from 'vue-lodash';
+Vue.use(VueLodash);

@@ -2,6 +2,10 @@
   text-shadow: 1px 0 0 #dc3545, -1px 0 0 #dc3545, 0 1px 0 #dc3545, 0 -1px 0 #dc3545, 1px 1px #dc3545, -1px -1px 0 #dc3545, 1px -1px 0 #dc3545, -1px 1px 0 #dc3545;
 }
 
+.shadow-white {
+  text-shadow: 1px 0 0 #fff, -1px 0 0 #fff, 0 1px 0 #fff, 0 -1px 0 #fff, 1px 1px #fff, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff;
+}
+
 .font-12 { font-size: 12px }
 .font-13 { font-size: 13px }
 .font-14 { font-size: 14px }
