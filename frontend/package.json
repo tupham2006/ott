@@ -22,7 +22,7 @@
     "bootstrap-vue": "^2.0.4",
     "js-cookie": "^2.2.1",
     "nuxt": "^2.10.2",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "vue-axios": "^2.1.5",
     "vue-lodash": "^2.0.2",
     "vue-socket.io": "^3.0.7",
