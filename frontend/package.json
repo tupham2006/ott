@@ -30,7 +30,7 @@
     "vuex-persistedstate": "^2.7.0"
   },
   "devDependencies": {
-    "node-sass": "^4.13.0",
+    "node-sass": "^7.0.0",
     "sass-loader": "^8.0.0"
   }
 }
